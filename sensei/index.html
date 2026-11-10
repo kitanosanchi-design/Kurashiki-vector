@@ -252,7 +252,7 @@ async function login(k, remember) {
     WHO = r.name;
     (remember ? localStorage : sessionStorage).setItem(KEYSTORE, k);
     $("login").classList.add("hidden"); $("app").classList.remove("hidden");
-    $("who").textContent = WHO + " 先生"; $("logout").classList.remove("hidden");
+    $("who").textContent = WHO + " 先生" + (r.classes && r.classes.length ? "（見られる組：" + r.classes.join("・") + "）" : ""); $("logout").classList.remove("hidden");
     loadList();
     return true;
   } catch (e) { KEY = ""; say($("loginMsg"), errText(e), "ng"); return false; }

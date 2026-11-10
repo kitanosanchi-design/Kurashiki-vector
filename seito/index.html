@@ -360,7 +360,7 @@ $("send").addEventListener("click", async () => {
     save();
     const d = load(); if (d) { d.sentAt = res.at; localStorage.setItem(STORE, JSON.stringify(d)); }
     say("送信しました ✓", "ok");
-    showDone(res.at);
+    showDone(res.at + (res.cls === "デモ" && clsVal() !== "デモ" ? "・デモ用の合言葉なので、組は「デモ」で受け付けました" : ""));
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (err) {
     say(err.message === "Failed to fetch" ? "通信できませんでした。電波のよい所で、もう一度押してください。" : err.message, "ng");
