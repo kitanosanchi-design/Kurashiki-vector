@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>生徒カード（記入）倉敷高校 特進</title>
+<style>
+:root{--ink:#1f2933;--sub:#5f6b7a;--line:#d9dee5;--bg:#f5f6f8;--acc:#1d5fa8;--acc2:#e8f0fa;--ok:#18794e;--ng:#b42318;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;-webkit-text-size-adjust:100%}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 16px 12px}
+header h1{margin:0;font-size:19px}
+header p{margin:2px 0 0;color:var(--sub);font-size:13px}
+main{max-width:640px;margin:0 auto;padding:12px 12px 120px}
+.note{background:var(--acc2);border-radius:10px;padding:12px 14px;font-size:14px;margin-bottom:12px}
+.note b{color:var(--acc)}
+section{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 14px 6px;margin-bottom:12px}
+section h2{margin:0 0 10px;font-size:16px;display:flex;align-items:center;gap:8px}
+section h2 span{background:var(--acc);color:#fff;border-radius:999px;font-size:12px;padding:1px 9px}
+.f{margin-bottom:14px}
+.f>label,.f>.lab{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.req{color:var(--ng);font-size:12px;margin-left:4px}
+.hint{color:var(--sub);font-size:12.5px;margin:-2px 0 6px}
+input[type=text],input[type=number],select,textarea{width:100%;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:0;border-color:var(--acc)}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.row .narrow{flex:0 0 96px}
+.choices{display:flex;flex-wrap:wrap;gap:6px}
+.choices label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14.5px;background:#fff;cursor:pointer;user-select:none}
+.choices input{accent-color:var(--acc);width:17px;height:17px;margin:0}
+.choices label:has(input:checked){border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
+.shibo{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.shibo .t{font-size:13px;color:var(--sub);margin-bottom:4px}
+.shibo input{margin-bottom:6px}
+.photo{display:flex;gap:12px;align-items:flex-start}
+.photo .pv{width:108px;height:136px;border-radius:10px;border:1px solid var(--line);background:#eef1f4 center/cover no-repeat;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12px;text-align:center}
+.photo .btns{display:flex;flex-direction:column;gap:8px;flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;font-size:15px;border-radius:10px;border:1px solid var(--acc);background:#fff;color:var(--acc);padding:9px 12px;cursor:pointer;text-align:center}
+.btn.main{background:var(--acc);color:#fff;font-size:17px;padding:13px 16px;width:100%}
+.btn:disabled{opacity:.55}
+.hidden{display:none!important}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.bar .in{max-width:640px;margin:0 auto}
+#msg{font-size:14px;margin-bottom:6px;min-height:0}
+#msg.ok{color:var(--ok);font-weight:600}
+#msg.ng{color:var(--ng);font-weight:600}
+.done{background:#e7f6ee;border:1px solid #b7e2c9;color:var(--ok);border-radius:12px;padding:14px;margin-bottom:12px;font-weight:600}
+.done small{display:block;color:var(--ink);font-weight:400;margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>生徒カード（記入）</h1>
+  <p>倉敷高校 特進コース</p>
+</header>
+<main>
+  <div id="doneBox" class="done hidden"></div>
+  <div class="note">
+    この記入と顔写真は、<b>北野先生と、特進の授業にかかわる先生だけ</b>が見ます。ほかの生徒には見えません。<br>
+    <span class="req">★</span>の所は必ず入れてください。ほかは、書ける所だけでかまいません。<br>
+    あとで書き直して、もう一度送ってもかまいません（新しいほうが残ります）。
+  </div>
+
+  <section>
+    <h2><span>1</span>あなたのこと</h2>
+    <div class="f">
+      <label for="code">クラスの合言葉<span class="req">★</span></label>
+      <div class="hint">配布プリントに書いてあります。</div>
+      <input type="text" id="code" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="f">
+      <div class="row">
+        <div><label for="cls">組<span class="req">★</span></label>
+          <select id="clsSel" class="hidden"></select>
+          <input type="text" id="cls" placeholder="例：3-1"></div>
+        <div class="narrow"><label for="num">番号<span class="req">★</span></label>
+          <input type="number" id="num" inputmode="numeric" min="1" max="99" placeholder="例：5"></div>
+      </div>
+    </div>
+    <div class="f"><label for="name">名前<span class="req">★</span></label><input type="text" id="name" placeholder="例：倉敷 花子" autocomplete="name"></div>
+    <div class="f"><label for="kana">ふりがな</label><input type="text" id="kana" placeholder="例：くらしき はなこ"></div>
+    <div class="f">
+      <div class="lab">顔写真<span class="req">★</span></div>
+      <div class="hint">肩から上・正面・明るい所で。帽子とマスクは外してください。2回目からは、変えるときだけでかまいません。</div>
+      <div class="photo">
+        <div class="pv" id="pv">まだ<br>ありません</div>
+        <div class="btns">
+          <label class="btn">📷 カメラで撮る<input type="file" id="camIn" accept="image/*" capture="user" class="hidden"></label>
+          <label class="btn">🖼 写真を選ぶ<input type="file" id="picIn" accept="image/*" class="hidden"></label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span>2</span>進路</h2>
+    <div class="f"><div class="lab">文系・理系</div>
+      <div class="choices" data-k="course" data-type="radio"><label><input type="radio" name="course" value="文系">文系</label><label><input type="radio" name="course" value="理系">理系</label><label><input type="radio" name="course" value="まだ決めていない">まだ決めていない</label></div></div>
+    <div class="f"><div class="lab">志望校</div>
+      <div class="shibo"><div class="t">第1志望</div><input type="text" id="s1u" placeholder="大学名（例：岡山大学）"><input type="text" id="s1f" placeholder="学部・学科（例：工学部 情報）"></div>
+      <div class="shibo"><div class="t">第2志望</div><input type="text" id="s2u" placeholder="大学名"><input type="text" id="s2f" placeholder="学部・学科"></div>
+      <div class="shibo"><div class="t">第3志望</div><input type="text" id="s3u" placeholder="大学名"><input type="text" id="s3f" placeholder="学部・学科"></div>
+    </div>
+    <div class="f"><div class="lab">受験の方式（いくつでも）</div>
+      <div class="choices" data-k="method" data-type="check"><label><input type="checkbox" value="一般選抜">一般選抜</label><label><input type="checkbox" value="学校推薦型">学校推薦型</label><label><input type="checkbox" value="総合型">総合型</label><label><input type="checkbox" value="共通テスト利用">共通テスト利用</label><label><input type="checkbox" value="まだ決めていない">まだ決めていない</label></div></div>
+    <div class="f"><div class="lab">共通テスト</div>
+      <div class="choices" data-k="kyotsu" data-type="radio"><label><input type="radio" name="kyotsu" value="受ける">受ける</label><label><input type="radio" name="kyotsu" value="受けない">受けない</label><label><input type="radio" name="kyotsu" value="まだ決めていない">まだ決めていない</label></div></div>
+    <div class="f"><label for="career">将来やりたいこと・つきたい仕事</label><textarea id="career" placeholder="まだ決まっていなければ、気になっていることでもOK"></textarea></div>
+  </section>
+
+  <section>
+    <h2><span>3</span>勉強</h2>
+    <div class="f"><div class="lab">得意な科目（いくつでも）</div>
+      <div class="choices" data-k="good" data-type="check" data-other="good_other"></div>
+      <input type="text" id="good_other" placeholder="その他・くわしく（例：数学の図形）" style="margin-top:6px"></div>
+    <div class="f"><div class="lab">苦手な科目（いくつでも）</div>
+      <div class="choices" data-k="bad" data-type="check" data-other="bad_other"></div>
+      <input type="text" id="bad_other" placeholder="その他・くわしく（例：英語の長文）" style="margin-top:6px"></div>
+    <div class="f"><label for="trouble">勉強で困っていること</label><textarea id="trouble" placeholder="例：計画を立てても続かない／数学の応用問題が手につかない"></textarea></div>
+    <div class="f"><div class="row">
+      <div><label for="hw_weekday">家での勉強（平日）</label><select id="hw_weekday"></select></div>
+      <div><label for="hw_holiday">家での勉強（休日）</label><select id="hw_holiday"></select></div>
+    </div></div>
+    <div class="f"><div class="lab">塾・予備校・通信講座</div>
+      <div class="choices" data-k="juku" data-type="radio"><label><input type="radio" name="juku" value="行っていない">行っていない</label><label><input type="radio" name="juku" value="塾・予備校">塾・予備校</label><label><input type="radio" name="juku" value="通信講座・映像授業">通信講座・映像授業</label></div>
+      <input type="text" id="juku_name" placeholder="名前と科目（例：〇〇塾 数学・英語）" style="margin-top:6px"></div>
+  </section>
+
+  <section>
+    <h2><span>4</span>生活</h2>
+    <div class="f"><label for="club">部活</label><input type="text" id="club" placeholder="例：陸上部"></div>
+    <div class="f"><div class="lab">部活の状況</div>
+      <div class="choices" data-k="club_status" data-type="radio"><label><input type="radio" name="club_status" value="活動中">活動中</label><label><input type="radio" name="club_status" value="引退した">引退した</label><label><input type="radio" name="club_status" value="入っていない">入っていない</label></div></div>
+    <div class="f"><label for="commute">通学時間（片道）</label><select id="commute"></select></div>
+    <div class="f"><div class="lab">アルバイト</div>
+      <div class="choices" data-k="job" data-type="radio"><label><input type="radio" name="job" value="していない">していない</label><label><input type="radio" name="job" value="している">している</label></div></div>
+  </section>
+
+  <section>
+    <h2><span>5</span>先生に伝えたいこと</h2>
+    <div class="f"><textarea id="message" placeholder="勉強のこと、進路のこと、配慮してほしいことなど、なんでも"></textarea></div>
+  </section>
+</main>
+
+<div class="bar"><div class="in">
+  <div id="msg"></div>
+  <button class="btn main" id="send">先生に送る</button>
+</div></div>
+
+<script>
+"use strict";
+const API = "https://script.google.com/macros/s/AKfycbxa14xUA-_rHG1tIvMPCCaTsNpdanDUH67jGdLQmGeY1CBfms4ZqlQ5si-cv6haWflV/exec";
+const STORE = "kurashiki_seitocard_v1";
+const SUBJ = ["国語", "数学", "英語", "理科", "地歴・公民", "情報"];
+const HOURS = ["", "ほとんどしない", "30分くらい", "1時間くらい", "2時間くらい", "3時間くらい", "4時間以上"];
+const COMMUTE = ["", "15分未満", "15〜30分", "30分〜1時間", "1時間以上"];
+const TEXT_KEYS = ["s1u", "s1f", "s2u", "s2f", "s3u", "s3f", "career", "trouble", "hw_weekday", "hw_holiday", "juku_name", "club", "commute", "message", "good_other", "bad_other"];
+const $ = id => document.getElementById(id);
+
+// 選択肢を作る
+for (const k of ["good", "bad"]) {
+  const box = document.querySelector(`[data-k="${k}"]`);
+  for (const s of SUBJ) {
+    const l = document.createElement("label"); const i = document.createElement("input");
+    i.type = "checkbox"; i.value = s; l.append(i, s); box.append(l);
+  }
+}
+const fillSel = (el, arr) => arr.forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = v || "選んでください"; el.append(o); });
+fillSel($("hw_weekday"), HOURS); fillSel($("hw_holiday"), HOURS); fillSel($("commute"), COMMUTE);
+
+let photo = "", thumb = "", photoSent = false;
+
+// ---- 写真を縮める ----
+function loadImg(file) {
+  return new Promise((ok, ng) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); ok(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("写真を読めませんでした。別の写真でためしてください。")); };
+    img.src = url;
+  });
+}
+function jpeg(img, maxSide, q, square) {
+  let sw = img.naturalWidth, sh = img.naturalHeight, sx = 0, sy = 0;
+  if (square) { const s = Math.min(sw, sh); sx = (sw - s) / 2; sy = (sh - s) * 0.25; sw = sh = s; }
+  const r = Math.min(1, maxSide / Math.max(sw, sh));
+  const c = document.createElement("canvas"); c.width = Math.round(sw * r); c.height = Math.round(sh * r);
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+  g.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", q).split(",")[1];
+}
+async function takePhoto(e) {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const img = await loadImg(f);
+    photo = jpeg(img, 640, 0.82, false);
+    thumb = jpeg(img, 160, 0.75, true);
+    showPhoto("data:image/jpeg;base64," + thumb);
+    save();
+  } catch (err) { say(err.message, "ng"); }
+}
+function showPhoto(src) { const pv = $("pv"); pv.style.backgroundImage = `url("${src}")`; pv.textContent = ""; }
+$("camIn").addEventListener("change", takePhoto);
+$("picIn").addEventListener("change", takePhoto);
+
+// ---- 値を集める・もどす ----
+function collect() {
+  const v = {};
+  TEXT_KEYS.forEach(k => v[k] = $(k).value.trim());
+  document.querySelectorAll(".choices[data-k]").forEach(box => {
+    const k = box.dataset.k;
+    const sel = [...box.querySelectorAll("input:checked")].map(i => i.value);
+    v[k] = box.dataset.type === "radio" ? (sel[0] || "") : sel.join("、");
+  });
+  return v;
+}
+function restore(v) {
+  TEXT_KEYS.forEach(k => { if (v[k] != null) $(k).value = v[k]; });
+  document.querySelectorAll(".choices[data-k]").forEach(box => {
+    const val = String(v[box.dataset.k] || "");
+    const set = box.dataset.type === "radio" ? [val] : val.split("、");
+    box.querySelectorAll("input").forEach(i => i.checked = set.includes(i.value));
+  });
+}
+// カードに入れる形（得意・苦手は「その他」を足す）
+function forSend(v) {
+  const o = Object.assign({}, v);
+  for (const k of ["good", "bad"]) {
+    const other = o[k + "_other"]; delete o[k + "_other"];
+    if (other) o[k] = o[k] ? o[k] + "／" + other : other;
+  }
+  return o;
+}
+function save() {
+  try {
+    localStorage.setItem(STORE, JSON.stringify({
+      code: $("code").value, cls: clsVal(), num: $("num").value, name: $("name").value, kana: $("kana").value,
+      values: collect(), thumb, photoSent, sentAt: (load() || {}).sentAt || ""
+    }));
+  } catch (e) { /* 端末に残せなくても送信はできる */ }
+}
+function load() { try { return JSON.parse(localStorage.getItem(STORE) || "null"); } catch (e) { return null; } }
+
+// ---- 組 ----
+let classes = [];
+function clsVal() { return classes.length ? $("clsSel").value : $("cls").value.trim(); }
+function setupClasses(list) {
+  classes = list || [];
+  if (!classes.length) return;
+  const sel = $("clsSel"); sel.innerHTML = "";
+  fillSel(sel, [""].concat(classes));
+  sel.classList.remove("hidden"); $("cls").classList.add("hidden");
+  const d = load(); if (d && classes.includes(d.cls)) sel.value = d.cls;
+  sel.addEventListener("change", save);
+}
+
+function say(t, cls) { const m = $("msg"); m.textContent = t; m.className = cls || ""; }
+
+// ---- 送る ----
+async function post(body) {
+  const r = await fetch(API, { method: "POST", body: JSON.stringify(body) });
+  if (!r.ok) throw new Error("通信できませんでした（" + r.status + "）。");
+  return r.json();
+}
+$("send").addEventListener("click", async () => {
+  const cls = clsVal(), num = $("num").value.trim(), name = $("name").value.trim();
+  const miss = [];
+  if (!$("code").value.trim()) miss.push("クラスの合言葉");
+  if (!cls) miss.push("組"); if (!num) miss.push("番号"); if (!name) miss.push("名前");
+  if (!photo && !photoSent) miss.push("顔写真");
+  if (miss.length) { say(miss.join("・") + " を入れてください。", "ng"); return; }
+  const btn = $("send"); btn.disabled = true; say("送っています…");
+  try {
+    const res = await post({ action: "student_submit", code: $("code").value.trim(), cls, num, name, kana: $("kana").value.trim(),
+      photo: photo || undefined, thumb: thumb && photo ? thumb : undefined, values: forSend(collect()) });
+    if (!res.ok) throw new Error(res.error || "送れませんでした。");
+    photoSent = true; photo = "";
+    save();
+    const d = load(); if (d) { d.sentAt = res.at; localStorage.setItem(STORE, JSON.stringify(d)); }
+    say("送信しました ✓", "ok");
+    showDone(res.at);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    say(err.message === "Failed to fetch" ? "通信できませんでした。電波のよい所で、もう一度押してください。" : err.message, "ng");
+  } finally { btn.disabled = false; }
+});
+function showDone(at) {
+  const b = $("doneBox"); b.classList.remove("hidden"); b.textContent = "送信しました ✓（" + at + "）";
+  const s = document.createElement("small"); s.textContent = "書き直したいときは、直してもう一度「先生に送る」を押してください。"; b.append(s);
+}
+
+// ---- はじめに ----
+(function init() {
+  const d = load();
+  if (d) {
+    $("code").value = d.code || ""; $("cls").value = d.cls || ""; $("num").value = d.num || "";
+    $("name").value = d.name || ""; $("kana").value = d.kana || "";
+    restore(d.values || {});
+    thumb = d.thumb || ""; photoSent = !!d.photoSent;
+    if (thumb) showPhoto("data:image/jpeg;base64," + thumb);
+    if (d.sentAt) showDone(d.sentAt);
+  }
+  document.addEventListener("input", () => { save(); if ($("msg").className === "ng") say(""); });
+  document.addEventListener("change", save);
+  post({ action: "student_config" }).then(c => {
+    if (!c.ok) return;
+    if (c.open === false) { say("いまは受け付けていません。", "ng"); $("send").disabled = true; }
+    setupClasses(c.classes);
+  }).catch(() => { /* 設定が読めなくても書ける */ });
+})();
+</script>
+</body>
+</html>

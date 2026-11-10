@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>生徒カード（先生用）倉敷高校 特進</title>
+<style>
+:root{--ink:#1f2933;--sub:#5f6b7a;--line:#d9dee5;--bg:#f5f6f8;--acc:#1d5fa8;--acc2:#e8f0fa;--ok:#18794e;--ng:#b42318;--warn:#9a6700;--warn2:#fff4d6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;-webkit-text-size-adjust:100%}
+header{background:#fff;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:17px;flex:1}
+header .who{font-size:13px;color:var(--sub)}
+nav{display:flex;gap:4px;padding:8px 12px 0;max-width:1100px;margin:0 auto}
+nav button{font:inherit;font-weight:600;border:1px solid var(--line);border-bottom:none;background:#eef1f4;color:var(--sub);border-radius:10px 10px 0 0;padding:8px 14px;cursor:pointer}
+nav button.on{background:#fff;color:var(--acc)}
+main{max-width:1100px;margin:0 auto;padding:0 12px 60px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:0 12px 12px 12px;padding:14px}
+.hidden{display:none!important}
+input[type=text],input[type=password],input[type=number],input[type=date],select,textarea{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
+textarea{width:100%;min-height:80px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:600;border-radius:9px;border:1px solid var(--acc);background:#fff;color:var(--acc);padding:7px 12px;cursor:pointer}
+.btn.main{background:var(--acc);color:#fff}
+.btn.small{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.5}
+.msg{font-size:14px;margin:6px 0}
+.msg.ok{color:var(--ok);font-weight:600}.msg.ng{color:var(--ng);font-weight:600}
+/* ログイン */
+#login{max-width:380px;margin:40px auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+#login h2{margin:0 0 6px;font-size:18px}
+#login input[type=password]{width:100%;margin:8px 0}
+/* 一覧 */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.tools input[type=text]{flex:1;min-width:160px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.stu{border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.stu:hover{border-color:var(--acc)}
+.stu .ph{width:86px;height:86px;border-radius:50%;background:#e5e9ee center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:11px}
+.stu .cn{font-size:12px;color:var(--sub)}
+.stu .nm{font-weight:700;font-size:15px;line-height:1.3}
+.badges{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.bd{font-size:11px;border-radius:999px;padding:0 7px;background:#eef1f4;color:var(--sub)}
+.bd.warn{background:var(--warn2);color:var(--warn)}
+.count{font-size:13px;color:var(--sub)}
+/* カード */
+#card{position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:10;-webkit-overflow-scrolling:touch}
+#card .top{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:8px;z-index:2}
+#card .top b{flex:1;font-size:16px}
+#card .body{max-width:900px;margin:0 auto;padding:12px}
+.box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.box h3{margin:0 0 8px;font-size:15px;color:var(--acc)}
+.head{display:flex;gap:14px;align-items:flex-start}
+.head .big{width:150px;aspect-ratio:3/4;border-radius:10px;background:#e5e9ee center/cover no-repeat;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12px;cursor:zoom-in}
+.head .nm{font-size:22px;font-weight:700;line-height:1.25}
+.head .kn{color:var(--sub);font-size:13px}
+.head .meta{font-size:13px;color:var(--sub);margin-top:6px}
+dl.kv{display:grid;grid-template-columns:9.5em 1fr;gap:4px 10px;margin:0}
+dl.kv dt{color:var(--sub);font-size:13px}
+dl.kv dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.tw{overflow-x:auto}
+table.t{border-collapse:collapse;font-size:13.5px;min-width:100%}
+table.t th,table.t td{border:1px solid var(--line);padding:4px 7px;text-align:center;white-space:nowrap}
+table.t th{background:#f0f3f7;font-weight:600}
+table.t td.l{text-align:left}
+.dev{display:block;font-size:11px;color:var(--sub)}
+.notes .n{border-left:3px solid var(--acc);padding:4px 10px;margin-bottom:8px;background:#fafbfc}
+.notes .n .m{font-size:12px;color:var(--sub)}
+.notes .n .x{white-space:pre-wrap;word-break:break-word}
+.files li{margin-bottom:6px}
+.sub{font-size:13px;color:var(--sub)}
+details.add{border:1px dashed var(--line);border-radius:10px;padding:8px 10px}
+details.add summary{cursor:pointer;font-weight:600;color:var(--acc)}
+.frow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.frow label{font-size:13px;color:var(--sub)}
+.srows input{width:7em}
+.srows input.subj{width:9em}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#18794e;color:#fff;border-radius:999px;padding:8px 18px;font-weight:600;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#viewer{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:20;display:flex;flex-direction:column}
+#viewer .vt{display:flex;gap:8px;align-items:center;padding:8px 12px;color:#fff}
+#viewer .vt b{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#viewer .vb{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:8px}
+#viewer img{max-width:100%;height:auto;background:#fff}
+#viewer iframe{width:100%;height:100%;border:0;background:#fff}
+/* 取り込み */
+.step{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.step h3{margin:0 0 8px;font-size:15px}
+.step h3 span{display:inline-block;background:var(--acc);color:#fff;border-radius:999px;font-size:12px;padding:0 8px;margin-right:6px}
+table.map td{white-space:normal;vertical-align:top}
+table.map select,table.map input{font-size:14px;padding:4px 6px}
+table.map input{width:6.5em}
+.samp{font-size:12px;color:var(--sub);max-width:11em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.warnbox{background:var(--warn2);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:13.5px;margin:6px 0}
+.chart{width:100%;max-width:640px;height:auto}
+@media print{
+  header,#app,#card .top,details.add,.notes textarea,.notes .frow,.notes .msg,#viewer{display:none!important}
+  #card{position:static;overflow:visible;background:#fff}
+  body{background:#fff}
+  .box{break-inside:avoid;border-color:#bbb}
+}
+@media (max-width:560px){
+  .head .big{width:112px}
+  .head .nm{font-size:19px}
+  dl.kv{grid-template-columns:7.5em 1fr}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px}
+  .stu .ph{width:70px;height:70px}
+}
+</style>
+</head>
+<body>
+<header><h1>生徒カード（先生用）</h1><span class="who" id="who"></span><button class="btn small hidden" id="logout">ログアウト</button></header>
+
+<div id="login">
+  <h2>先生の合言葉</h2>
+  <div class="sub">北野先生から受け取った、あなた専用の合言葉を入れてください。</div>
+  <input type="password" id="key" autocomplete="current-password">
+  <label class="sub"><input type="checkbox" id="remember"> この端末に覚えさせる（自分だけが使う端末のときだけ）</label>
+  <div style="margin-top:10px"><button class="btn main" id="loginBtn">入る</button></div>
+  <div class="msg" id="loginMsg"></div>
+</div>
+
+<div id="app" class="hidden">
+  <nav><button data-tab="list" class="on">生徒一覧</button><button data-tab="imp">成績を取り込む（Excel・CSV）</button></nav>
+  <main>
+    <div class="panel" id="tab-list">
+      <div class="tools">
+        <input type="text" id="q" placeholder="名前・ふりがな・組で探す">
+        <select id="filt"><option value="">すべて</option><option value="un">未記入だけ</option><option value="done">記入ずみだけ</option></select>
+        <button class="btn small" id="reload">読みなおす</button>
+      </div>
+      <div class="count" id="count"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="panel hidden" id="tab-imp">
+      <div class="step">
+        <h3><span>1</span>ファイルを選ぶ</h3>
+        <div class="sub">学校の成績一覧や模試のデータ（.xlsx / .xls / .csv）。PDF や紙の成績表は、生徒カードの「この生徒に成績を入れる」から付けてください。</div>
+        <div class="frow"><input type="file" id="xf" accept=".xlsx,.xls,.csv,.xlsm"><select id="xsheet" class="hidden"></select></div>
+        <div class="msg" id="xmsg"></div>
+      </div>
+      <div id="xsteps" class="hidden">
+        <div class="step">
+          <h3><span>2</span>表の形</h3>
+          <div class="frow">
+            <label>見出しの行 <input type="number" id="xhead" min="1" max="30" style="width:5em"></label>
+            <label><input type="radio" name="xform" value="wide" checked> 1行に1人（科目が横に並ぶ）</label>
+            <label><input type="radio" name="xform" value="long"> 1行に1科目（科目の列がある）</label>
+          </div>
+        </div>
+        <div class="step">
+          <h3><span>3</span>列の役わり</h3>
+          <div class="sub">自動で見当をつけています。ちがう所だけ直してください。満点は科目ごとに入れられます。</div>
+          <div class="tw"><table class="t map" id="xmap"></table></div>
+          <div class="frow"><label>組の列がないときの組 <input type="text" id="xcls" placeholder="例：3-1" style="width:8em"></label></div>
+        </div>
+        <div class="step">
+          <h3><span>4</span>試験</h3>
+          <div class="frow">
+            <label>試験名 <input type="text" id="xexam" placeholder="例：第2回 全統共テ模試" style="width:16em"></label>
+            <label>実施日 <input type="date" id="xdate"></label>
+          </div>
+          <div class="sub">同じ「試験名・実施日・生徒・科目」がすでにあれば、新しい点に置きかえます。</div>
+        </div>
+        <div class="step">
+          <h3><span>5</span>確かめて取り込む</h3>
+          <div id="xcheck"></div>
+          <div class="tw"><table class="t" id="xprev"></table></div>
+          <div class="frow"><button class="btn main" id="xgo">取り込む</button></div>
+          <div class="msg" id="xgomsg"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="card" class="hidden">
+  <div class="top"><button class="btn small" id="back">← 一覧</button><b id="ctitle"></b><button class="btn small" id="cprint">印刷</button></div>
+  <div class="body" id="cbody"></div>
+</div>
+
+<div id="toast" class="hidden" role="status"></div>
+<div id="viewer" class="hidden">
+  <div class="vt"><b id="vname"></b><a class="btn small" id="vopen" target="_blank" rel="noopener" style="background:#fff">別の画面で開く</a><button class="btn small" id="vclose" style="background:#fff">閉じる</button></div>
+  <div class="vb" id="vbody"></div>
+</div>
+
+<script src="xlsx.full.min.js"></script>
+<script>
+"use strict";
+const API = "https://script.google.com/macros/s/AKfycbxa14xUA-_rHG1tIvMPCCaTsNpdanDUH67jGdLQmGeY1CBfms4ZqlQ5si-cv6haWflV/exec";
+const KEYSTORE = "kurashiki_seitocard_teacher";
+const $ = id => document.getElementById(id);
+
+// 安全に要素を作る（記入内容は必ず textContent で入れる）
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "style") e.setAttribute("style", v);
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (k in e && k !== "list") e[k] = v;
+    else e.setAttribute(k, v);
+  }
+  for (const c of kids.flat(Infinity)) { if (c == null || c === false) continue; e.append(c instanceof Node ? c : String(c)); }
+  return e;
+}
+let toastT = 0;
+function toast(t) { const e = $("toast"); e.textContent = t; e.classList.remove("hidden"); clearTimeout(toastT); toastT = setTimeout(() => e.classList.add("hidden"), 2600); }
+function say(el, t, cls) { el.textContent = t || ""; el.className = "msg " + (cls || ""); }
+const nk = s => String(s == null ? "" : s).normalize("NFKC").replace(/\s+/g, "").trim();
+const nn = s => { const t = nk(s); return /^\d+$/.test(t) ? String(Number(t)) : t; };
+const keyOf = (c, n) => nk(c) + "|" + nn(n);
+
+let KEY = "", WHO = "", STUDENTS = [];
+
+async function api(body) {
+  const r = await fetch(API, { method: "POST", body: JSON.stringify(Object.assign({ key: KEY }, body)) });
+  if (!r.ok) throw new Error("通信できませんでした（" + r.status + "）。");
+  const j = await r.json();
+  if (!j.ok) {
+    if (/合言葉/.test(j.error || "")) { logout(); }
+    throw new Error(j.error || "うまくいきませんでした。");
+  }
+  return j;
+}
+const errText = e => e.message === "Failed to fetch" ? "通信できませんでした。もう一度ためしてください。" : e.message;
+
+// ---------- ログイン ----------
+async function login(k, remember) {
+  KEY = k;
+  try {
+    const r = await api({ action: "whoami" });
+    WHO = r.name;
+    (remember ? localStorage : sessionStorage).setItem(KEYSTORE, k);
+    $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+    $("who").textContent = WHO + " 先生"; $("logout").classList.remove("hidden");
+    loadList();
+    return true;
+  } catch (e) { KEY = ""; say($("loginMsg"), errText(e), "ng"); return false; }
+}
+function logout() {
+  KEY = ""; localStorage.removeItem(KEYSTORE); sessionStorage.removeItem(KEYSTORE);
+  $("app").classList.add("hidden"); $("card").classList.add("hidden"); $("login").classList.remove("hidden");
+  $("who").textContent = ""; $("logout").classList.add("hidden"); $("key").value = "";
+}
+$("loginBtn").onclick = () => { const k = $("key").value.trim(); if (k) login(k, $("remember").checked); };
+$("key").addEventListener("keydown", e => { if (e.key === "Enter") $("loginBtn").click(); });
+$("logout").onclick = logout;
+
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  $("tab-list").classList.toggle("hidden", b.dataset.tab !== "list");
+  $("tab-imp").classList.toggle("hidden", b.dataset.tab !== "imp");
+});
+
+// ---------- 一覧 ----------
+async function loadList() {
+  $("count").textContent = "読みこんでいます…";
+  try { const r = await api({ action: "list" }); STUDENTS = r.students || []; drawList(); }
+  catch (e) { $("count").textContent = errText(e); }
+}
+function drawList() {
+  const q = nk($("q").value).toLowerCase(), f = $("filt").value;
+  const g = $("grid"); g.textContent = "";
+  const shown = STUDENTS.filter(s => {
+    if (f === "un" && s.submitted) return false;
+    if (f === "done" && !s.submitted) return false;
+    if (!q) return true;
+    return [s.name, s.kana, s.cls, s.cls + "-" + s.num].some(x => nk(x).toLowerCase().includes(q));
+  });
+  const done = STUDENTS.filter(s => s.submitted).length;
+  $("count").textContent = `${shown.length}人を表示（全${STUDENTS.length}人・記入ずみ${done}人）`;
+  shown.forEach(s => {
+    const okThumb = /^[A-Za-z0-9+/=]+$/.test(s.thumb || "");
+    const ph = h("div", { class: "ph" }, okThumb ? "" : "写真なし");
+    if (okThumb) ph.style.backgroundImage = `url("data:image/jpeg;base64,${s.thumb}")`;
+    g.append(h("div", { class: "stu", onclick: () => openCard(s) },
+      ph,
+      h("div", { class: "cn" }, `${s.cls}　${s.num}番`),
+      h("div", { class: "nm" }, s.name || "（名前なし）"),
+      h("div", { class: "badges" },
+        s.submitted ? null : h("span", { class: "bd warn" }, "未記入"),
+        s.grades ? h("span", { class: "bd" }, `成績${s.grades}`) : null,
+        s.files ? h("span", { class: "bd" }, `資料${s.files}`) : null,
+        s.notes ? h("span", { class: "bd" }, `所見${s.notes}`) : null)));
+  });
+}
+$("q").addEventListener("input", drawList);
+$("filt").addEventListener("change", drawList);
+$("reload").onclick = loadList;
+
+// ---------- 生徒カード ----------
+let CUR = null;
+async function openCard(s) {
+  CUR = s;
+  $("card").classList.remove("hidden"); document.body.style.overflow = "hidden";
+  $("ctitle").textContent = `${s.cls}　${s.num}番　${s.name || ""}`;
+  const body = $("cbody"); body.textContent = "読みこんでいます…";
+  try { const c = await api({ action: "card", cls: s.cls, num: s.num }); drawCard(c); }
+  catch (e) { body.textContent = errText(e); }
+}
+function closeCard() { $("card").classList.add("hidden"); document.body.style.overflow = ""; CUR = null; }
+$("back").onclick = () => { closeCard(); loadList(); };
+$("cprint").onclick = () => window.print();
+
+function drawCard(c) {
+  const body = $("cbody"); body.textContent = "";
+  const name = c.name || (CUR && CUR.name) || "";
+  CUR = Object.assign({}, CUR, { name });
+  // 写真と名前
+  const big = h("div", { class: "big" }, c.photo ? "" : (c.photoError || "写真なし"));
+  if (c.photo) {
+    big.style.backgroundImage = `url("data:image/jpeg;base64,${c.photo}")`;
+    big.onclick = () => showBlob(b64blob(c.photo, "image/jpeg"), name + " の写真", "image/jpeg");
+  }
+  body.append(h("div", { class: "box" }, h("div", { class: "head" }, big, h("div", null,
+    h("div", { class: "nm" }, name || "（名前なし）"),
+    h("div", { class: "kn" }, c.kana || ""),
+    h("div", { class: "meta" }, `${c.cls}　${c.num}番`),
+    h("div", { class: "meta" }, c.submitted ? `最終更新 ${c.updated}（${c.count}回目の送信）` : "生徒の記入はまだありません"),
+    c.history && c.history.some(x => /要確認/.test(x.state)) ? h("div", { class: "warnbox" }, "この組・番号に、別の名前での送信がありました（スプレッドシートの「記入履歴」で確かめてください）。") : null
+  ))));
+  // 記入内容
+  if (c.submitted) {
+    const secs = {};
+    c.profile.forEach(p => { (secs[p.section] = secs[p.section] || []).push(p); });
+    Object.keys(secs).forEach(sec => {
+      const items = secs[sec].filter(p => p.value);
+      body.append(h("div", { class: "box" }, h("h3", null, sec),
+        items.length ? h("dl", { class: "kv" }, items.map(p => [h("dt", null, p.label), h("dd", null, p.value)])) : h("div", { class: "sub" }, "記入なし")));
+    });
+  }
+  body.append(gradesBox(c));
+  body.append(filesBox(c));
+  if (c.kyotsu) body.append(kyotsuBox(c.kyotsu));
+  body.append(notesBox(c));
+  body.append(addBox(c));
+}
+
+// 成績：試験ごと × 科目
+function gradesBox(c) {
+  const box = h("div", { class: "box" }, h("h3", null, "成績"));
+  if (!c.grades.length) { box.append(h("div", { class: "sub" }, "まだありません。")); return box; }
+  const exams = [], subj = [];
+  const cell = {};
+  c.grades.forEach(g => {
+    const ek = g.date + "｜" + g.exam;
+    if (!exams.includes(ek)) exams.push(ek);
+    if (!subj.includes(g.subject)) subj.push(g.subject);
+    cell[ek + "¦" + g.subject] = g;
+  });
+  exams.sort();
+  const tb = h("table", { class: "t" }, h("tr", null, h("th", null, "実施日"), h("th", null, "試験"), subj.map(s => h("th", null, s))));
+  exams.forEach(ek => {
+    const [d, ex] = ek.split("｜");
+    tb.append(h("tr", null, h("td", null, d), h("td", { class: "l" }, ex), subj.map(s => {
+      const g = cell[ek + "¦" + s];
+      if (!g) return h("td", null, "");
+      return h("td", null, g.max !== "" && g.max != null ? `${g.score}/${g.max}` : String(g.score),
+        g.dev !== "" && g.dev != null ? h("span", { class: "dev" }, "偏差値 " + g.dev) : null,
+        g.rank !== "" && g.rank != null ? h("span", { class: "dev" }, "順位 " + g.rank) : null);
+    })));
+  });
+  box.append(h("div", { class: "tw" }, tb));
+  const ch = chart(exams, subj, cell);
+  if (ch) box.append(h("div", { class: "sub", style: "margin-top:8px" }, "得点率（％）の推移"), ch);
+  return box;
+}
+function chart(exams, subj, cell) {
+  if (exams.length < 2) return null;
+  const W = 640, H = 200, L = 34, R = 10, T = 10, B = 24;
+  const colors = ["#1d5fa8", "#c2410c", "#15803d", "#7c3aed", "#b45309", "#0e7490", "#be123c", "#4d7c0f"];
+  const x = i => L + (W - L - R) * (exams.length === 1 ? 0.5 : i / (exams.length - 1));
+  const y = v => T + (H - T - B) * (1 - v / 100);
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "chart", role: "img", "aria-label": "得点率の推移" });
+  [0, 25, 50, 75, 100].forEach(v => {
+    svg.append(el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: "#e3e7ec" }));
+    const t = el("text", { x: L - 4, y: y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "#5f6b7a" }); t.textContent = v; svg.append(t);
+  });
+  exams.forEach((ek, i) => {
+    const t = el("text", { x: x(i), y: H - B + 16, "text-anchor": "middle", "font-size": 11, fill: "#5f6b7a" });
+    t.textContent = ek.split("｜")[0].slice(5); svg.append(t);
+  });
+  let drawn = 0;
+  const legend = h("div", { class: "sub", style: "display:flex;flex-wrap:wrap;gap:4px 12px" });
+  subj.forEach((s, si) => {
+    const pts = [];
+    exams.forEach((ek, i) => {
+      const g = cell[ek + "¦" + s];
+      if (g && typeof g.score === "number" && typeof g.max === "number" && g.max > 0) pts.push([x(i), y(Math.max(0, Math.min(100, g.score / g.max * 100)))]);
+    });
+    if (!pts.length) return;
+    drawn++;
+    const col = colors[si % colors.length];
+    if (pts.length > 1) svg.append(el("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: col, "stroke-width": 2 }));
+    pts.forEach(p => svg.append(el("circle", { cx: p[0], cy: p[1], r: 3.5, fill: col })));
+    legend.append(h("span", { style: "color:" + col }, "● " + s));
+  });
+  return drawn ? h("div", null, svg, legend) : null;
+}
+
+function filesBox(c) {
+  const box = h("div", { class: "box files" }, h("h3", null, "成績資料（PDF・写真）"));
+  if (!c.files.length) { box.append(h("div", { class: "sub" }, "まだありません。")); return box; }
+  box.append(h("ul", { style: "margin:0;padding-left:18px" }, c.files.map(f => h("li", null,
+    `${f.date || ""} ${f.exam}${f.kind ? "（" + f.kind + "）" : ""} `,
+    h("button", { class: "btn small", onclick: () => openFile(f) }, "見る"),
+    h("div", { class: "sub" }, `${f.by} 先生が登録（${f.at}）`)))));
+  return box;
+}
+async function openFile(f) {
+  try {
+    const r = await api({ action: "getfile", id: f.id });
+    showBlob(b64blob(r.data, r.mime), r.filename, r.mime);
+  } catch (e) { alert(errText(e)); }
+}
+function b64blob(b64, mime) {
+  const bin = atob(b64); const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return new Blob([u], { type: mime });
+}
+let VURL = "";
+function showBlob(blob, name, mime) {
+  if (VURL) URL.revokeObjectURL(VURL);
+  VURL = URL.createObjectURL(blob);
+  $("vname").textContent = name; $("vopen").href = VURL; $("vopen").setAttribute("download", name);
+  const vb = $("vbody"); vb.textContent = "";
+  vb.append(mime === "application/pdf" ? h("iframe", { src: VURL, title: name }) : h("img", { src: VURL, alt: name }));
+  $("viewer").classList.remove("hidden");
+}
+$("vclose").onclick = () => { $("viewer").classList.add("hidden"); $("vbody").textContent = ""; };
+
+function kyotsuBox(k) {
+  const box = h("div", { class: "box" }, h("h3", null, "共テ数学アプリの記録（1回目の得点）"));
+  if (k.error) { box.append(h("div", { class: "sub" }, k.error)); return box; }
+  if (!k.days.length && !k.tests.length) { box.append(h("div", { class: "sub" }, "まだありません（組・番号が同じ記録を探しています）。")); return box; }
+  if (k.days.length) {
+    const tot = k.days.reduce((a, d) => a + (Number(d.score) || 0), 0), mx = k.days.reduce((a, d) => a + (Number(d.max) || 0), 0);
+    box.append(h("div", { class: "sub" }, `${k.days.length}日分・合計 ${tot}/${mx}（${mx ? Math.round(tot / mx * 100) : 0}％）`));
+    box.append(h("div", { class: "tw" }, h("table", { class: "t" },
+      h("tr", null, h("th", null, "Day"), h("th", null, "単元"), h("th", null, "得点"), h("th", null, "ミス"), h("th", null, "日時")),
+      k.days.map(d => h("tr", null, h("td", null, d.day), h("td", { class: "l" }, d.title), h("td", null, `${d.score}/${d.max}`), h("td", { class: "l" }, d.miss), h("td", null, d.at))))));
+  }
+  if (k.tests.length) {
+    box.append(h("div", { class: "sub", style: "margin-top:8px" }, "通し演習"));
+    box.append(h("div", { class: "tw" }, h("table", { class: "t" },
+      h("tr", null, h("th", null, "回"), h("th", null, "問題"), h("th", null, "ⅠA"), h("th", null, "ⅡBC"), h("th", null, "日時")),
+      k.tests.map(d => h("tr", null, h("td", null, d.no), h("td", { class: "l" }, d.title), h("td", null, d.ia), h("td", null, d.ii), h("td", null, d.at))))));
+  }
+  return box;
+}
+
+function notesBox(c) {
+  const ta = h("textarea", { placeholder: "面談のメモ、気づいたこと、ほかの先生に伝えたいことなど" });
+  const msg = h("div", { class: "msg" });
+  const btn = h("button", { class: "btn main" }, "所見を残す");
+  btn.onclick = async () => {
+    const text = ta.value.trim(); if (!text) return;
+    btn.disabled = true;
+    try { await api({ action: "note", cls: c.cls, num: c.num, name: CUR.name, text }); ta.value = ""; say(msg, "残しました ✓", "ok"); toast("所見を残しました ✓"); refreshCard(); }
+    catch (e) { say(msg, errText(e), "ng"); } finally { btn.disabled = false; }
+  };
+  return h("div", { class: "box notes" }, h("h3", null, "所見（先生どうしで共有）"),
+    c.notes.length ? c.notes.map(n => h("div", { class: "n" }, h("div", { class: "m" }, `${n.at}　${n.by} 先生`), h("div", { class: "x" }, n.text))) : h("div", { class: "sub" }, "まだありません。"),
+    h("div", { style: "margin-top:10px" }, ta), h("div", { class: "frow" }, btn), msg,
+    h("div", { class: "sub" }, "※ 残した所見は、この画面からは消せません（直すときは北野先生へ）。"));
+}
+async function refreshCard() {
+  if (!CUR) return;
+  try { const c = await api({ action: "card", cls: CUR.cls, num: CUR.num }); drawCard(c); } catch (e) { /* そのまま */ }
+}
+
+// この生徒に成績を入れる（PDF・紙の写真・手入力）
+function addBox(c) {
+  const exam = h("input", { type: "text", placeholder: "例：第2回 全統共テ模試", style: "width:15em" });
+  const date = h("input", { type: "date" });
+  const kind = h("select", null, ["模試", "定期考査", "課題・小テスト", "その他"].map(v => h("option", { value: v }, v)));
+  const file = h("input", { type: "file", accept: "application/pdf,image/*" });
+  const cam = h("input", { type: "file", accept: "image/*", capture: "environment", class: "hidden" });
+  const msg = h("div", { class: "msg" });
+  const rows = h("tbody");
+  const addRow = () => rows.append(h("tr", null,
+    h("td", null, h("input", { type: "text", class: "subj", placeholder: "科目" })),
+    h("td", null, h("input", { type: "text", inputmode: "decimal", placeholder: "得点" })),
+    h("td", null, h("input", { type: "text", inputmode: "decimal", placeholder: "満点", value: "100" })),
+    h("td", null, h("input", { type: "text", inputmode: "decimal", placeholder: "偏差値" })),
+    h("td", null, h("input", { type: "text", inputmode: "decimal", placeholder: "順位" }))));
+  addRow(); addRow(); addRow();
+  const need = () => {
+    if (!exam.value.trim()) { say(msg, "試験名を入れてください。", "ng"); return false; }
+    if (!date.value) { say(msg, "実施日を入れてください。", "ng"); return false; }
+    return true;
+  };
+  const upBtn = h("button", { class: "btn main" }, "資料を付ける");
+  const upload = async (f) => {
+    if (!f) { say(msg, "ファイルを選んでください。", "ng"); return; }
+    if (!need()) return;
+    upBtn.disabled = true; say(msg, "送っています…");
+    try {
+      let mime = f.type, data;
+      if (mime.startsWith("image/")) { data = await shrink(f, 2200, 0.85); mime = "image/jpeg"; }
+      else if (mime === "application/pdf") data = await toB64(f);
+      else throw new Error("PDF か写真を選んでください。");
+      if (data.length > 14000000) throw new Error("ファイルが大きすぎます（約10MBまで）。");
+      const name = mime === "image/jpeg" && !/\.jpe?g$/i.test(f.name) ? (f.name.replace(/\.[^.]+$/, "") || "写真") + ".jpg" : f.name;
+      await api({ action: "file", cls: c.cls, num: c.num, name: CUR.name, exam: exam.value.trim(), date: date.value, kind: kind.value, mime, filename: name, data });
+      say(msg, "付けました ✓", "ok"); toast("資料を付けました ✓"); file.value = ""; refreshCard();
+    } catch (e) { say(msg, errText(e), "ng"); } finally { upBtn.disabled = false; }
+  };
+  upBtn.onclick = () => upload(file.files[0]);
+  cam.onchange = () => upload(cam.files[0]);
+  const scBtn = h("button", { class: "btn main" }, "点数を入れる");
+  scBtn.onclick = async () => {
+    if (!need()) return;
+    const data = [...rows.querySelectorAll("tr")].map(tr => [...tr.querySelectorAll("input")].map(i => i.value.trim()))
+      .filter(r => r[0] && r[1] !== "")
+      .map(r => ({ cls: c.cls, num: c.num, name: CUR.name, subject: r[0], score: r[1], max: r[2], dev: r[3], rank: r[4], note: kind.value }));
+    if (!data.length) { say(msg, "科目と得点を入れてください。", "ng"); return; }
+    scBtn.disabled = true;
+    try { const r = await api({ action: "grades", exam: exam.value.trim(), date: date.value, rows: data }); const t = `入れました ✓（${data.length}科目${r.replaced ? "・置きかえ" + r.replaced : ""}）`; say(msg, t, "ok"); toast(t); refreshCard(); }
+    catch (e) { say(msg, errText(e), "ng"); } finally { scBtn.disabled = false; }
+  };
+  return h("div", { class: "box" }, h("details", { class: "add" }, h("summary", null, "この生徒に成績を入れる（PDF・紙の写真・手入力）"),
+    h("div", { class: "frow" }, h("label", null, "試験名 ", exam), h("label", null, "実施日 ", date), h("label", null, "種類 ", kind)),
+    h("div", { class: "sub", style: "margin-top:6px" }, "PDF・写真を付ける"),
+    h("div", { class: "frow" }, file, upBtn, h("label", { class: "btn" }, "📷 紙を撮る", cam)),
+    h("div", { class: "sub", style: "margin-top:6px" }, "点数を手で入れる（PDF・紙から写すとき）"),
+    h("div", { class: "tw srows" }, h("table", { class: "t" }, h("tr", null, ["科目", "得点", "満点", "偏差値", "順位"].map(x => h("th", null, x))), rows)),
+    h("div", { class: "frow" }, h("button", { class: "btn small", onclick: addRow }, "行を足す"), scBtn),
+    msg));
+}
+function toB64(f) {
+  return new Promise((ok, ng) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = () => ng(new Error("読めませんでした。")); r.readAsDataURL(f); });
+}
+function shrink(f, maxSide, q) {
+  return new Promise((ok, ng) => {
+    const url = URL.createObjectURL(f); const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const r = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      const cv = document.createElement("canvas"); cv.width = Math.round(img.naturalWidth * r); cv.height = Math.round(img.naturalHeight * r);
+      const g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
+      ok(cv.toDataURL("image/jpeg", q).split(",")[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); ng(new Error("写真を読めませんでした。")); };
+    img.src = url;
+  });
+}
+
+// ---------- Excel・CSV の取り込み ----------
+let WB = null, AOA = [], COLS = [];
+const ROLES_WIDE = [["", "使わない"], ["cls", "組"], ["num", "番号"], ["name", "名前"], ["score", "得点（科目）"], ["dev", "偏差値"], ["rank", "順位"]];
+const ROLES_LONG = [["", "使わない"], ["cls", "組"], ["num", "番号"], ["name", "名前"], ["subject", "科目"], ["score", "得点"], ["max", "満点"], ["dev", "偏差値"], ["rank", "順位"]];
+
+$("xf").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  say($("xmsg"), "読みこんでいます…");
+  try {
+    const buf = await f.arrayBuffer();
+    if (/\.csv$/i.test(f.name)) {
+      let text;
+      try { text = new TextDecoder("utf-8", { fatal: true }).decode(buf); }
+      catch (err) { text = new TextDecoder("shift_jis").decode(buf); }   // Excel の CSV は Shift_JIS が多い
+      WB = XLSX.read(text.replace(/^﻿/, ""), { type: "string", raw: true });
+    } else {
+      WB = XLSX.read(buf, { type: "array" });
+    }
+    const sel = $("xsheet"); sel.textContent = "";
+    WB.SheetNames.forEach(n => sel.append(h("option", { value: n }, n)));
+    sel.classList.toggle("hidden", WB.SheetNames.length < 2);
+    say($("xmsg"), `「${f.name}」を読みました。`, "ok");
+    useSheet(WB.SheetNames[0]);
+  } catch (err) { say($("xmsg"), "読めませんでした：" + err.message, "ng"); }
+});
+$("xsheet").addEventListener("change", e => useSheet(e.target.value));
+function useSheet(n) {
+  AOA = XLSX.utils.sheet_to_json(WB.Sheets[n], { header: 1, defval: "", raw: false, blankrows: false });
+  let hr = 0;
+  for (let i = 0; i < Math.min(AOA.length, 15); i++) {
+    const cells = AOA[i].filter(v => String(v).trim() !== "");
+    if (cells.length >= 3 && cells.filter(v => isNaN(Number(String(v).replace(/,/g, "")))).length >= cells.length * 0.6) { hr = i; break; }
+  }
+  $("xhead").value = hr + 1;
+  $("xsteps").classList.remove("hidden");
+  buildMap(true);
+}
+$("xhead").addEventListener("change", () => buildMap(true));
+document.querySelectorAll('input[name=xform]').forEach(r => r.addEventListener("change", () => buildMap(false)));
+const form = () => document.querySelector('input[name=xform]:checked').value;
+
+function guess(head, vals, isLong) {
+  const t = nk(head);
+  if (/^(組|クラス|学級|HR|ホームルーム)/i.test(t) || /^組$/.test(t)) return { role: "cls" };
+  if (/^(出席番号|番号|番|No\.?|NO\.?|№)$/i.test(t)) return { role: "num" };
+  if (/(氏名|名前|生徒名)$/.test(t) && !/(ふりがな|フリガナ|カナ|かな)/.test(t)) return { role: "name" };
+  if (/(ふりがな|フリガナ|カナ|かな|学籍|受験番号|性別|コース)/.test(t)) return { role: "" };
+  if (isLong) {
+    if (/^(科目|教科)(名)?$/.test(t)) return { role: "subject" };
+    if (/(満点|配点)/.test(t)) return { role: "max" };
+    if (/偏差/.test(t)) return { role: "dev" };
+    if (/(順位|席次)/.test(t)) return { role: "rank" };
+    if (/(得点|点数|素点|点)$/.test(t)) return { role: "score" };
+    return { role: "" };
+  }
+  if (/偏差/.test(t)) return { role: "dev", subj: t.replace(/偏差値?|[()（）]/g, "") };
+  if (/(順位|席次)/.test(t)) return { role: "rank", subj: t.replace(/順位|席次|[()（）]/g, "") };
+  const nums = vals.filter(v => String(v).trim() !== "");
+  if (nums.length && nums.filter(v => !isNaN(Number(String(v).replace(/,/g, "")))).length >= nums.length * 0.7) return { role: "score", max: /合計|総合|総点/.test(t) ? "" : "100" };
+  return { role: "" };
+}
+function buildMap(autoForm) {
+  const hr = Math.max(1, Number($("xhead").value) || 1) - 1;
+  const head = AOA[hr] || [];
+  const data = AOA.slice(hr + 1).filter(r => r.some(v => String(v).trim() !== ""));
+  const n = Math.max(head.length, ...data.slice(0, 50).map(r => r.length));
+  if (autoForm) {
+    const isLong = head.some(x => /^(科目|教科)(名)?$/.test(nk(x)));
+    document.querySelector(`input[name=xform][value=${isLong ? "long" : "wide"}]`).checked = true;
+  }
+  const isLong = form() === "long";
+  COLS = [];
+  for (let j = 0; j < n; j++) {
+    const hd = String(head[j] == null ? "" : head[j]).trim() || `（${j + 1}列目）`;
+    const vals = data.slice(0, 30).map(r => r[j] == null ? "" : r[j]);
+    const g = guess(hd, vals, isLong);
+    COLS.push({ j, head: hd, sample: vals.filter(v => String(v).trim() !== "").slice(0, 2).join("・"), role: g.role, subj: g.subj != null ? g.subj : hd, max: g.max != null ? g.max : "100" });
+  }
+  drawMap();
+}
+function drawMap() {
+  const isLong = form() === "long";
+  const roles = isLong ? ROLES_LONG : ROLES_WIDE;
+  const tb = $("xmap"); tb.textContent = "";
+  tb.append(h("tr", null, h("th", null, "列（見出し）と例"), h("th", null, "役わり"), isLong ? null : h("th", null, "科目名"), isLong ? null : h("th", null, "満点")));
+  const scoreSubj = COLS.filter(c => c.role === "score").map(c => c.subj);
+  COLS.forEach(c => {
+    const sel = h("select", { onchange: e => { c.role = e.target.value; drawMap(); } }, roles.map(([v, l]) => h("option", { value: v, selected: c.role === v }, l)));
+    let subjCell = null, maxCell = null;
+    if (!isLong) {
+      if (c.role === "score") {
+        subjCell = h("input", { type: "text", value: c.subj, oninput: e => { c.subj = e.target.value.trim(); preview(); } });
+        maxCell = h("input", { type: "text", inputmode: "decimal", value: c.max, placeholder: "なし", oninput: e => { c.max = e.target.value.trim(); preview(); } });
+      } else if (c.role === "dev" || c.role === "rank") {
+        if (!scoreSubj.includes(c.subj)) c.subj = scoreSubj.find(s => c.head.includes(s)) || scoreSubj.find(s => /合計|総合|総点/.test(s)) || scoreSubj[0] || "";
+        subjCell = h("select", { onchange: e => { c.subj = e.target.value; preview(); } }, scoreSubj.map(s => h("option", { value: s, selected: s === c.subj }, s)));
+      }
+    }
+    tb.append(h("tr", null, h("td", { class: "l" }, c.head, h("div", { class: "samp" }, c.sample)), h("td", null, sel),
+      isLong ? null : h("td", null, subjCell || ""), isLong ? null : h("td", null, maxCell || "")));
+  });
+  preview();
+}
+// 表 → 送る行（1行1科目）。名簿と照らし合わせる
+function records() {
+  const hr = Math.max(1, Number($("xhead").value) || 1) - 1;
+  const data = AOA.slice(hr + 1).filter(r => r.some(v => String(v).trim() !== ""));
+  const col = r => COLS.find(c => c.role === r);
+  const cC = col("cls"), cN = col("num"), cM = col("name");
+  const fixedCls = $("xcls").value.trim();
+  const out = [];
+  const isLong = form() === "long";
+  data.forEach(r => {
+    const get = c => c ? String(r[c.j] == null ? "" : r[c.j]).trim() : "";
+    const base = { cls: get(cC) || fixedCls, num: get(cN), name: get(cM) };
+    if (!base.num && !base.name) return;               // 合計行・空行など
+    if (/^(平均|合計|最高|最低|人数)/.test(base.name) || /^(平均|合計)/.test(base.cls)) return;
+    if (isLong) {
+      const rec = Object.assign({}, base, { subject: get(col("subject")), score: get(col("score")), max: get(col("max")), dev: get(col("dev")), rank: get(col("rank")) });
+      if (rec.subject && rec.score !== "") out.push(rec);
+    } else {
+      COLS.filter(c => c.role === "score").forEach(c => {
+        const score = get(c); if (score === "") return;
+        const dev = COLS.find(d => d.role === "dev" && d.subj === c.subj), rank = COLS.find(d => d.role === "rank" && d.subj === c.subj);
+        out.push(Object.assign({}, base, { subject: c.subj, score, max: c.max, dev: get(dev), rank: get(rank) }));
+      });
+    }
+  });
+  // 名簿と照合：名前が1人だけ一致 → その生徒の組・番号にそろえる。名前がちがっても組・番号が一致 → その生徒
+  const byName = {}, byKey = {};
+  STUDENTS.forEach(s => { const k = nk(s.name); if (k) (byName[k] = byName[k] || []).push(s); byKey[keyOf(s.cls, s.num)] = s; });
+  out.forEach(o => {
+    const cand = byName[nk(o.name)];
+    if (o.name && cand && cand.length === 1) { o.match = "名前"; o.cls = cand[0].cls; o.num = cand[0].num; o.name = cand[0].name; }
+    else if (o.cls && o.num && byKey[keyOf(o.cls, o.num)]) { const s = byKey[keyOf(o.cls, o.num)]; o.match = o.name && nk(o.name) !== nk(s.name) ? "番号（名前ちがい）" : "番号"; o.fileName = o.name; o.name = s.name; }
+    else o.match = "";
+  });
+  return out;
+}
+function preview() {
+  const recs = records();
+  const ck = $("xcheck"); ck.textContent = "";
+  const who = {}; recs.forEach(r => { who[keyOf(r.cls, r.num) + "|" + nk(r.name)] = r; });
+  const people = Object.values(who);
+  const newOnes = people.filter(p => !p.match), diff = people.filter(p => p.match === "番号（名前ちがい）");
+  const noId = people.filter(p => !p.cls || !p.num);
+  ck.append(h("div", null, `${people.length}人・${recs.length}行（名簿と一致 ${people.length - newOnes.length}人）`));
+  if (noId.length) ck.append(h("div", { class: "warnbox" }, `組か番号が分からない人が${noId.length}人います。「組」「番号」の列か、「組の列がないときの組」を確かめてください：` + noId.slice(0, 8).map(p => p.name || "?").join("、")));
+  if (newOnes.length && STUDENTS.length) ck.append(h("div", { class: "warnbox" }, `名簿にない人が${newOnes.length}人います（新しく一覧に加わります）：` + newOnes.slice(0, 10).map(p => `${p.cls}-${p.num} ${p.name}`).join("、") + (newOnes.length > 10 ? " ほか" : "")));
+  if (diff.length) ck.append(h("div", { class: "warnbox" }, `組・番号は一致したが名前がちがう人が${diff.length}人います（名簿の名前で入れます）：` + diff.slice(0, 10).map(p => `${p.cls}-${p.num} ${p.fileName}→${p.name}`).join("、")));
+  if (!COLS.some(c => c.role === "score")) ck.append(h("div", { class: "warnbox" }, "「得点」の列を1つ以上えらんでください。"));
+  const pv = $("xprev"); pv.textContent = "";
+  pv.append(h("tr", null, ["組", "番号", "名前", "科目", "得点", "満点", "偏差値", "順位", "照合"].map(x => h("th", null, x))));
+  recs.slice(0, 12).forEach(r => pv.append(h("tr", null, [r.cls, r.num, r.name, r.subject, r.score, r.max, r.dev, r.rank, r.match || "新"].map(x => h("td", null, x)))));
+  if (recs.length > 12) pv.append(h("tr", null, h("td", { colspan: 9, class: "l" }, `… ほか ${recs.length - 12} 行`)));
+}
+$("xcls").addEventListener("input", preview);
+$("xgo").onclick = async () => {
+  const m = $("xgomsg");
+  const exam = $("xexam").value.trim(), date = $("xdate").value;
+  if (!exam || !date) { say(m, "試験名と実施日を入れてください。", "ng"); return; }
+  const recs = records().filter(r => r.cls && r.num);
+  if (!recs.length) { say(m, "取り込める行がありません。", "ng"); return; }
+  const btn = $("xgo"); btn.disabled = true;
+  let added = 0, replaced = 0;
+  try {
+    for (let i = 0; i < recs.length; i += 1000) {
+      say(m, `送っています…（${Math.min(i + 1000, recs.length)}/${recs.length}行）`);
+      const r = await api({ action: "grades", exam, date, rows: recs.slice(i, i + 1000).map(({ cls, num, name, subject, score, max, dev, rank }) => ({ cls, num, name, subject, score, max, dev, rank })) });
+      added += r.added; replaced += r.replaced;
+    }
+    say(m, `取り込みました ✓（新しく${added}行・置きかえ${replaced}行）`, "ok");
+    loadList();
+  } catch (e) { say(m, errText(e) + "（途中まで入っている場合は、もう一度押すと置きかえになります）", "ng"); }
+  finally { btn.disabled = false; }
+};
+
+// ---------- はじめに ----------
+(function init() {
+  const k = localStorage.getItem(KEYSTORE) || sessionStorage.getItem(KEYSTORE);
+  if (k) login(k, !!localStorage.getItem(KEYSTORE));
+  window.addEventListener("keydown", e => { if (e.key === "Escape") { if (!$("viewer").classList.contains("hidden")) $("vclose").click(); else if (!$("card").classList.contains("hidden")) $("back").click(); } });
+})();
+</script>
+</body>
+</html>
