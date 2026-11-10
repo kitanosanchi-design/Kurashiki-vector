@@ -26,15 +26,22 @@ input[type=text],input[type=number],select,textarea{width:100%;font:inherit;font
 textarea{min-height:84px;resize:vertical}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:0;border-color:var(--acc)}
 .row{display:flex;gap:8px}
-.row>*{flex:1}
+.row>*{flex:1;min-width:0}
 .row .narrow{flex:0 0 96px}
 .choices{display:flex;flex-wrap:wrap;gap:6px}
 .choices label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:14.5px;background:#fff;cursor:pointer;user-select:none}
 .choices input{accent-color:var(--acc);width:17px;height:17px;margin:0}
 .choices label:has(input:checked){border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
-.shibo{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
-.shibo .t{font-size:13px;color:var(--sub);margin-bottom:4px}
-.shibo input{margin-bottom:6px}
+.school{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:8px 10px 4px;margin-bottom:10px;background:#fbfcfe}
+.school .sh{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.school .sh b{flex:1;color:var(--acc)}
+.school .sh button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:3px 9px;color:var(--ink)}
+.school .sh button.del{color:var(--ng)}
+.school input,.school select{margin-bottom:6px}
+.school .sub2{font-size:12.5px;color:var(--sub);margin:0 0 2px}
+.school.done{border-left-color:var(--ok);background:#f3fbf6}
+.school .tip{font-size:12.5px;color:var(--ok);margin:-2px 0 6px}
+input[type=date]{width:100%;max-width:100%;min-width:0;display:block;-webkit-appearance:none;appearance:none;font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-height:42px}
 .photo{display:flex;gap:12px;align-items:flex-start}
 .photo .pv{width:108px;height:136px;border-radius:10px;border:1px solid var(--line);background:#eef1f4 center/cover no-repeat;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12px;text-align:center}
 .photo .btns{display:flex;flex-direction:column;gap:8px;flex:1}
@@ -99,13 +106,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-off
     <h2><span>2</span>進路</h2>
     <div class="f"><div class="lab">文系・理系</div>
       <div class="choices" data-k="course" data-type="radio"><label><input type="radio" name="course" value="文系">文系</label><label><input type="radio" name="course" value="理系">理系</label><label><input type="radio" name="course" value="まだ決めていない">まだ決めていない</label></div></div>
-    <div class="f"><div class="lab">志望校</div>
-      <div class="shibo"><div class="t">第1志望</div><input type="text" id="s1u" placeholder="大学名（例：岡山大学）"><input type="text" id="s1f" placeholder="学部・学科（例：工学部 情報）"></div>
-      <div class="shibo"><div class="t">第2志望</div><input type="text" id="s2u" placeholder="大学名"><input type="text" id="s2f" placeholder="学部・学科"></div>
-      <div class="shibo"><div class="t">第3志望</div><input type="text" id="s3u" placeholder="大学名"><input type="text" id="s3f" placeholder="学部・学科"></div>
+    <div class="f"><div class="lab">志望校（志望の順に）</div>
+      <div class="hint">もう受けた学校・合格した学校・決まった学校も入れてください。大学のほか、短大・専門学校も。「↑」「↓」で順番を変えられます。</div>
+      <div id="schools"></div>
+      <button type="button" class="btn" id="addSchool">＋ 志望校を足す</button>
     </div>
-    <div class="f"><div class="lab">受験の方式（いくつでも）</div>
-      <div class="choices" data-k="method" data-type="check"><label><input type="checkbox" value="一般選抜">一般選抜</label><label><input type="checkbox" value="学校推薦型">学校推薦型</label><label><input type="checkbox" value="総合型">総合型</label><label><input type="checkbox" value="共通テスト利用">共通テスト利用</label><label><input type="checkbox" value="まだ決めていない">まだ決めていない</label></div></div>
     <div class="f"><div class="lab">共通テスト</div>
       <div class="choices" data-k="kyotsu" data-type="radio"><label><input type="radio" name="kyotsu" value="受ける">受ける</label><label><input type="radio" name="kyotsu" value="受けない">受けない</label><label><input type="radio" name="kyotsu" value="まだ決めていない">まだ決めていない</label></div></div>
     <div class="f"><label for="career">将来やりたいこと・つきたい仕事</label><textarea id="career" placeholder="まだ決まっていなければ、気になっていることでもOK"></textarea></div>
@@ -157,7 +162,11 @@ const STORE = "kurashiki_seitocard_v1";
 const SUBJ = ["国語", "数学", "英語", "理科", "地歴・公民", "情報"];
 const HOURS = ["", "ほとんどしない", "30分くらい", "1時間くらい", "2時間くらい", "3時間くらい", "4時間以上"];
 const COMMUTE = ["", "15分未満", "15〜30分", "30分〜1時間", "1時間以上"];
-const TEXT_KEYS = ["s1u", "s1f", "s2u", "s2f", "s3u", "s3f", "career", "trouble", "hw_weekday", "hw_holiday", "juku_name", "club", "commute", "message", "good_other", "bad_other"];
+const METHODS = ["", "一般選抜（私立など）", "一般選抜（国公立 前期）", "一般選抜（国公立 中期）", "一般選抜（国公立 後期）", "共通テスト利用", "学校推薦型（指定校）", "学校推薦型（公募）", "総合型", "その他"];
+const SENPEI = ["", "専願", "併願", "わからない"];
+const STATUS = ["", "検討中", "出願予定", "出願済み", "受験済み（結果待ち）", "合格", "補欠・繰り上げ待ち", "不合格", "辞退した", "入学先に決定（手続き済み）"];
+const MAX_SCHOOLS = 15;
+const TEXT_KEYS = ["career", "trouble", "hw_weekday", "hw_holiday", "juku_name", "club", "commute", "message", "good_other", "bad_other"];
 const $ = id => document.getElementById(id);
 
 // 選択肢を作る
@@ -207,6 +216,69 @@ $("camIn").addEventListener("change", takePhoto);
 $("picIn").addEventListener("change", takePhoto);
 
 // ---- 値を集める・もどす ----
+// ---- 志望校 ----
+function schoolBox(d) {
+  d = d || {};
+  const box = document.createElement("div"); box.className = "school";
+  const mk = (tag, cls, attrs) => { const e = document.createElement(tag); if (cls) e.className = cls; Object.assign(e, attrs || {}); return e; };
+  const sel = (k, arr, label) => { const s = mk("select", null); s.dataset.k = k; s.setAttribute("aria-label", label); arr.forEach(v => { const o = mk("option"); o.value = v; o.textContent = v || "選ぶ"; s.append(o); }); s.value = d[k] || ""; return s; };
+  const date = (k) => { const i = mk("input"); i.type = "date"; i.dataset.k = k; i.value = d[k] || ""; return i; };
+  const lab = (t, el, k) => { const w = mk("div"); w.dataset.w = k; const p = mk("div", "sub2"); p.textContent = t; w.append(p, el); return w; };
+  const head = mk("div", "sh"); const ttl = mk("b");
+  const up = mk("button", null, { type: "button", textContent: "↑" }); up.setAttribute("aria-label", "上へ");
+  const dn = mk("button", null, { type: "button", textContent: "↓" }); dn.setAttribute("aria-label", "下へ");
+  const del = mk("button", "del", { type: "button", textContent: "消す" });
+  head.append(ttl, up, dn, del);
+  const name = mk("input"); name.type = "text"; name.dataset.k = "name"; name.placeholder = "学校名（例：岡山大学）"; name.value = d.name || "";
+  const dept = mk("input"); dept.type = "text"; dept.dataset.k = "dept"; dept.placeholder = "学部・学科（例：工学部 情報）"; dept.value = d.dept || "";
+  const me = lab("受験の方式", sel("method", METHODS, "方式"), "method");
+  const r1 = mk("div", "row"); const st = lab("いまの状況", sel("status", STATUS, "状況"), "status"); st.style.flex = "1.8";
+  r1.append(lab("専願・併願", sel("senpei", SENPEI, "専願・併願"), "senpei"), st);
+  const r2 = mk("div", "row"); r2.append(lab("出願締切", date("apply"), "apply"), lab("試験日", date("exam"), "exam"));
+  const r3 = mk("div", "row"); r3.append(lab("合格発表", date("result"), "result"), lab("入学手続き締切", date("proc"), "proc"));
+  const tip = mk("div", "tip"); tip.textContent = "専願で合格したら、ふつうはそこが入学先です。手続きがすんだら「入学先に決定」にしてください。";
+  box.append(head, name, dept, me, r1, r2, r3, tip);
+  up.onclick = () => { const p = box.previousElementSibling; if (p) box.parentNode.insertBefore(box, p); renumber(); save(); };
+  dn.onclick = () => { const n = box.nextElementSibling; if (n) box.parentNode.insertBefore(n, box); renumber(); save(); };
+  del.onclick = () => {
+    if ((name.value || dept.value) && !confirm((name.value || "この志望校") + " を消しますか？")) return;
+    box.remove(); if (!$("schools").children.length) $("schools").append(schoolBox()); renumber(); save();
+  };
+  box.addEventListener("change", () => { adjust(box); });
+  adjust(box);
+  return box;
+}
+// 状況に合わせて、出す日付を変える
+function adjust(box) {
+  const st = box.querySelector('[data-k=status]').value, sp = box.querySelector('[data-k=senpei]').value;
+  const show = (k, on) => box.querySelector(`[data-w=${k}]`).classList.toggle("hidden", !on);
+  show("apply", ["", "検討中", "出願予定"].includes(st));
+  show("exam", !["辞退した"].includes(st));
+  show("result", ["出願済み", "受験済み（結果待ち）", "補欠・繰り上げ待ち", "合格", "不合格", "入学先に決定（手続き済み）"].includes(st));
+  show("proc", ["合格", "補欠・繰り上げ待ち", "入学先に決定（手続き済み）"].includes(st));
+  box.querySelector(".tip").classList.toggle("hidden", !(sp === "専願" && st === "合格"));
+  box.classList.toggle("done", /入学先に決定/.test(st));
+}
+function renumber() {
+  const list = [...$("schools").children];
+  list.forEach((b, i) => { b.querySelector(".sh b").textContent = `第${i + 1}志望`; });
+  $("addSchool").classList.toggle("hidden", list.length >= MAX_SCHOOLS);
+}
+function getSchools() {
+  return [...$("schools").children].map(b => {
+    const o = {}; b.querySelectorAll("[data-k]").forEach(e => { o[e.dataset.k] = e.value.trim(); }); return o;
+  }).filter(o => o.name || o.dept);
+}
+function setSchools(arr) {
+  const box = $("schools"); box.textContent = "";
+  (arr && arr.length ? arr : [{}]).slice(0, MAX_SCHOOLS).forEach(d => box.append(schoolBox(d)));
+  renumber();
+}
+$("addSchool").addEventListener("click", () => {
+  if ($("schools").children.length >= MAX_SCHOOLS) return;
+  const b = schoolBox(); $("schools").append(b); renumber(); b.querySelector("input").focus(); save();
+});
+
 function collect() {
   const v = {};
   TEXT_KEYS.forEach(k => v[k] = $(k).value.trim());
@@ -215,9 +287,13 @@ function collect() {
     const sel = [...box.querySelectorAll("input:checked")].map(i => i.value);
     v[k] = box.dataset.type === "radio" ? (sel[0] || "") : sel.join("、");
   });
+  v.schools = getSchools();
   return v;
 }
 function restore(v) {
+  // 前の版（第1〜第3志望の欄）で書いたものを移す
+  if (!v.schools && (v.s1u || v.s2u || v.s3u)) v.schools = [1, 2, 3].map(i => ({ name: v["s" + i + "u"] || "", dept: v["s" + i + "f"] || "" })).filter(o => o.name || o.dept);
+  setSchools(v.schools);
   TEXT_KEYS.forEach(k => { if (v[k] != null) $(k).value = v[k]; });
   document.querySelectorAll(".choices[data-k]").forEach(box => {
     const val = String(v[box.dataset.k] || "");
@@ -227,7 +303,7 @@ function restore(v) {
 }
 // カードに入れる形（得意・苦手は「その他」を足す）
 function forSend(v) {
-  const o = Object.assign({}, v);
+  const o = Object.assign({}, v); delete o.schools;
   for (const k of ["good", "bad"]) {
     const other = o[k + "_other"]; delete o[k + "_other"];
     if (other) o[k] = o[k] ? o[k] + "／" + other : other;
@@ -272,10 +348,13 @@ $("send").addEventListener("click", async () => {
   if (!cls) miss.push("組"); if (!num) miss.push("番号"); if (!name) miss.push("名前");
   if (!photo && !photoSent) miss.push("顔写真");
   if (miss.length) { say(miss.join("・") + " を入れてください。", "ng"); return; }
+  const schools = getSchools();
+  if (schools.filter(x => /入学先に決定/.test(x.status)).length > 1) { say("「入学先に決定」は1校だけにしてください。", "ng"); return; }
+  if (schools.some(x => !x.name)) { say("志望校の学校名が空の所があります。", "ng"); return; }
   const btn = $("send"); btn.disabled = true; say("送っています…");
   try {
     const res = await post({ action: "student_submit", code: $("code").value.trim(), cls, num, name, kana: $("kana").value.trim(),
-      photo: photo || undefined, thumb: thumb && photo ? thumb : undefined, values: forSend(collect()) });
+      photo: photo || undefined, thumb: thumb && photo ? thumb : undefined, values: forSend(collect()), schools });
     if (!res.ok) throw new Error(res.error || "送れませんでした。");
     photoSent = true; photo = "";
     save();
@@ -295,6 +374,7 @@ function showDone(at) {
 // ---- はじめに ----
 (function init() {
   const d = load();
+  setSchools([]);
   if (d) {
     $("code").value = d.code || ""; $("cls").value = d.cls || ""; $("num").value = d.num || "";
     $("name").value = d.name || ""; $("kana").value = d.kana || "";

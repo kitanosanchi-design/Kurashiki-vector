@@ -43,6 +43,21 @@ textarea{width:100%;min-height:80px}
 .badges{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
 .bd{font-size:11px;border-radius:999px;padding:0 7px;background:#eef1f4;color:var(--sub)}
 .bd.warn{background:var(--warn2);color:var(--warn)}
+.bd.ok{background:#e7f6ee;color:var(--ok);font-weight:600}
+.decided{background:#e7f6ee;border:1px solid #b7e2c9;color:var(--ok);border-radius:8px;padding:6px 10px;font-weight:700;margin-top:8px}
+.sch{border-left:4px solid var(--line);padding:6px 10px;margin-bottom:8px;background:#fafbfc;border-radius:0 8px 8px 0}
+.sch .n{font-weight:700}
+.sch .n small{font-weight:400;color:var(--sub);margin-right:6px}
+.sch .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.sch .chip{font-size:12px;border-radius:999px;padding:0 8px;background:#eef1f4;color:var(--ink)}
+.sch .dates{font-size:12.5px;color:var(--sub);margin-top:2px}
+.sch.s-done{border-left-color:var(--ok);background:#f3fbf6}
+.sch.s-pass{border-left-color:#3aa66f}
+.sch.s-wait{border-left-color:#d4a017}
+.sch.s-fail,.sch.s-quit{border-left-color:#b9c0c8;opacity:.8}
+.chip.st-done,.chip.st-pass{background:#e7f6ee;color:var(--ok);font-weight:600}
+.chip.st-wait{background:var(--warn2);color:var(--warn);font-weight:600}
+.chip.st-fail{background:#f3f4f6;color:#6b7280}
 .count{font-size:13px;color:var(--sub)}
 /* カード */
 #card{position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:10;-webkit-overflow-scrolling:touch}
@@ -126,7 +141,7 @@ table.map input{width:6.5em}
     <div class="panel" id="tab-list">
       <div class="tools">
         <input type="text" id="q" placeholder="名前・ふりがな・組で探す">
-        <select id="filt"><option value="">すべて</option><option value="un">未記入だけ</option><option value="done">記入ずみだけ</option></select>
+        <select id="filt"><option value="">すべて</option><option value="un">未記入だけ</option><option value="done">記入ずみだけ</option><option value="dec">進路決定</option><option value="undec">進路未決定</option></select>
         <button class="btn small" id="reload">読みなおす</button>
       </div>
       <div class="count" id="count"></div>
@@ -269,11 +284,13 @@ function drawList() {
   const shown = STUDENTS.filter(s => {
     if (f === "un" && s.submitted) return false;
     if (f === "done" && !s.submitted) return false;
+    if (f === "dec" && !s.decided) return false;
+    if (f === "undec" && s.decided) return false;
     if (!q) return true;
     return [s.name, s.kana, s.cls, s.cls + "-" + s.num].some(x => nk(x).toLowerCase().includes(q));
   });
-  const done = STUDENTS.filter(s => s.submitted).length;
-  $("count").textContent = `${shown.length}人を表示（全${STUDENTS.length}人・記入ずみ${done}人）`;
+  const done = STUDENTS.filter(s => s.submitted).length, dec = STUDENTS.filter(s => s.decided).length;
+  $("count").textContent = `${shown.length}人を表示（全${STUDENTS.length}人・記入ずみ${done}人・進路決定${dec}人）`;
   shown.forEach(s => {
     const okThumb = /^[A-Za-z0-9+/=]+$/.test(s.thumb || "");
     const ph = h("div", { class: "ph" }, okThumb ? "" : "写真なし");
@@ -284,6 +301,9 @@ function drawList() {
       h("div", { class: "nm" }, s.name || "（名前なし）"),
       h("div", { class: "badges" },
         s.submitted ? null : h("span", { class: "bd warn" }, "未記入"),
+        s.decided ? h("span", { class: "bd ok", title: s.decided }, "決定") : null,
+        !s.decided && s.pass ? h("span", { class: "bd ok" }, `合格${s.pass}`) : null,
+        !s.decided && s.wait ? h("span", { class: "bd warn" }, `結果待ち${s.wait}`) : null,
         s.grades ? h("span", { class: "bd" }, `成績${s.grades}`) : null,
         s.files ? h("span", { class: "bd" }, `資料${s.files}`) : null,
         s.notes ? h("span", { class: "bd" }, `所見${s.notes}`) : null)));
@@ -322,6 +342,7 @@ function drawCard(c) {
     h("div", { class: "kn" }, c.kana || ""),
     h("div", { class: "meta" }, `${c.cls}　${c.num}番`),
     h("div", { class: "meta" }, c.submitted ? `最終更新 ${c.updated}（${c.count}回目の送信）` : "生徒の記入はまだありません"),
+    c.decided ? h("div", { class: "decided" }, "進路決定：" + c.decided) : null,
     c.history && c.history.some(x => /要確認/.test(x.state)) ? h("div", { class: "warnbox" }, "この組・番号に、別の名前での送信がありました（スプレッドシートの「記入履歴」で確かめてください）。") : null
   ))));
   // 記入内容
@@ -332,6 +353,7 @@ function drawCard(c) {
       const items = secs[sec].filter(p => p.value);
       body.append(h("div", { class: "box" }, h("h3", null, sec),
         items.length ? h("dl", { class: "kv" }, items.map(p => [h("dt", null, p.label), h("dd", null, p.value)])) : h("div", { class: "sub" }, "記入なし")));
+      if (sec === "進路") body.append(schoolsBox(c.schools || []));
     });
   }
   body.append(gradesBox(c));
@@ -339,6 +361,26 @@ function drawCard(c) {
   if (c.kyotsu) body.append(kyotsuBox(c.kyotsu));
   body.append(notesBox(c));
   body.append(addBox(c));
+}
+
+// 志望校：順番どおり。状況で色を変える
+function schoolsBox(list) {
+  const box = h("div", { class: "box" }, h("h3", null, `志望校（${list.length}校）`));
+  if (!list.length) { box.append(h("div", { class: "sub" }, "記入なし")); return box; }
+  const kind = st => /入学先に決定/.test(st) ? "done" : /^合格/.test(st) ? "pass" : /結果待ち|補欠/.test(st) ? "wait" : /不合格/.test(st) ? "fail" : /辞退/.test(st) ? "quit" : "";
+  const d = v => v ? v.replace(/^\d{4}[-/]/, "").replace("-", "/") : "";
+  list.forEach((x, i) => {
+    const k = kind(x.status);
+    const dates = [["出願締切", x.apply], ["試験", x.exam], ["発表", x.result], ["手続き締切", x.proc]].filter(p => p[1]).map(p => p[0] + " " + d(p[1])).join("　");
+    box.append(h("div", { class: "sch" + (k ? " s-" + k : "") },
+      h("div", { class: "n" }, h("small", null, `第${i + 1}志望`), x.name, x.dept ? " " + x.dept : ""),
+      h("div", { class: "chips" },
+        x.method ? h("span", { class: "chip" }, x.method) : null,
+        x.senpei ? h("span", { class: "chip" }, x.senpei) : null,
+        x.status ? h("span", { class: "chip st-" + (k || "none") }, x.status) : h("span", { class: "chip" }, "状況：未記入")),
+      dates ? h("div", { class: "dates" }, dates) : null));
+  });
+  return box;
 }
 
 // 成績：試験ごと × 科目
